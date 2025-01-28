@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { getToken, isTokenValid, removeToken, setToken } from "@/lib/auth";
+import { isTokenValid, removeToken, setToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
@@ -41,3 +41,11 @@ export default function AuthProvider({
     </AuthContext.Provider>
   );
 }
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
