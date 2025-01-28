@@ -2,7 +2,9 @@ import { jwtDecode } from "jwt-decode";
 
 export const getToken = () => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    console.log("Token from localStorage: ", token);
+    return token;
   }
   return null;
 };
