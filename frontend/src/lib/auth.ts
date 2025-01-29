@@ -1,27 +1,32 @@
-const TOKEN_KEY = "auth_token";
+import { jwtDecode } from "jwt-decode";
 
-export const getToken = (): string | null => {
+export const getToken = () => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem(TOKEN_KEY);
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+    return token;
   }
   return null;
 };
 
 export const setToken = (token: string) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(TOKEN_KEY, token);
-    document.cookie = `token=${token}; path=/; max-age=86400`; // 24 hours
-  }
+  document.cookie = `token=${token}; path=/; max-age=3600`; // Set cookie dengan expiry 1 jam
 };
 
 export const removeToken = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem(TOKEN_KEY);
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
-  }
+  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
 
-export const isTokenValid = (): boolean => {
+export const isTokenValid = () => {
   const token = getToken();
-  return !!token;
+  if (!token) return false;
+
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.exp! * 1000 > Date.now();
+  } catch {
+    return false;
+  }
 };

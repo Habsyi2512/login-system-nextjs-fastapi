@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  isLoading: boolean;
   login: (token: string) => void;
   logout: () => void;
 }
@@ -18,55 +17,29 @@ export default function AuthProvider({
   children: React.ReactNode;
 }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = () => {
-      try {
-        const authStatus = isTokenValid();
-        setIsAuthenticated(authStatus);
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
+    const authStatus = isTokenValid();
+    setIsAuthenticated(authStatus);
   }, []);
 
   const login = (token: string) => {
-    try {
-      setToken(token);
-      setIsAuthenticated(true);
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
-      setIsAuthenticated(false);
-    }
+    setToken(token);
+    setIsAuthenticated(true);
+    router.push("/dashboard");
   };
 
   const logout = () => {
-    try {
-      removeToken();
-      setIsAuthenticated(false);
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    removeToken();
+    setIsAuthenticated(false);
+    router.push("/login");
   };
-
-  if (isLoading) {
-    return null; // atau komponen loading jika ada
-  }
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        isLoading,
         login,
         logout,
       }}
