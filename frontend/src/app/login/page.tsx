@@ -31,7 +31,6 @@ export default function Page() {
       }
 
       const data = await response.json();
-      console.log("data = ", data);
       login(data.access_token);
       router.push("/dashboard");
     } catch {

@@ -1,30 +1,27 @@
-import { jwtDecode } from "jwt-decode";
+const TOKEN_KEY = "auth_token";
 
-export const getToken = () => {
+export const getToken = (): string | null => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
-    console.log("Token from localStorage: ", token);
-    return token;
+    return localStorage.getItem(TOKEN_KEY);
   }
   return null;
 };
 
 export const setToken = (token: string) => {
-  localStorage.setItem("token", token);
+  if (typeof window !== "undefined") {
+    localStorage.setItem(TOKEN_KEY, token);
+    document.cookie = `token=${token}; path=/; max-age=86400`; // 24 hours
+  }
 };
 
 export const removeToken = () => {
-  localStorage.removeItem("token");
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(TOKEN_KEY);
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+  }
 };
 
-export const isTokenValid = () => {
+export const isTokenValid = (): boolean => {
   const token = getToken();
-  if (!token) return false;
-
-  try {
-    const decoded = jwtDecode(token);
-    return decoded.exp! * 1000 > Date.now();
-  } catch {
-    return false;
-  }
+  return !!token;
 };
